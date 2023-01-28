@@ -1,3 +1,6 @@
+from decimal import Decimal
+from fractions import Fraction
+
 # chops a number to [digits] sig figs
 def chopping_value(num, digits):
     num = str(num)
@@ -9,6 +12,8 @@ def chopping_value(num, digits):
     while index < len(str(num)):
         if digits > 0:
             build += num[index]
+        elif num[index] == '.':
+            build += '.'
         else:
             build += '0'
         if num[index] != '0':
@@ -33,6 +38,21 @@ def rounding_value(num, digits):
 
     return tens * round(num, digits)
 
+def approx(function, derivative, init, tol):
+    f = function
+    dev = derivative
+    p_prev = init
+    count = 0
+    while (True):
+        count += 1
+        x = p_prev
+        # print("Guessing: " + str(x))
+        p_next = p_prev - eval(f)/eval(dev)
+        # print("New Val: " + str(p_next))
+        if abs(p_next - p_prev) < tol:
+            # print("COUNT: " + str(count))
+            return count
+        p_prev = p_next
 
 # rounding can either be "none", "rounding", or "chopping"
 def bin_to_double(number, rounding = "none"):
@@ -49,12 +69,7 @@ def bin_to_double(number, rounding = "none"):
     for i in range(11):  # range goes from [0, 10]
         if c_raw[i] == '1':
             c_additional = 2**(10-i)
-            if rounding == "none":
-                c += c_additional
-            elif rounding == "rounding":
-                c += rounding_value(c_additional, 3)
-            elif rounding == "chopping":
-                c += chopping_value(c_additional, 3)
+            c += c_additional
 
     # print("c: " + str(c))
 
@@ -63,12 +78,7 @@ def bin_to_double(number, rounding = "none"):
     for i in range(52):  # range goes from [0, 51]
         if f_raw[i] == '1':
             f_additional = 0.5**(i+1)
-            if rounding == "none":
-                f += f_additional
-            elif rounding == "rounding":
-                f += rounding_value(f_additional, 3)
-            elif rounding == "chopping":
-                f += chopping_value(f_additional, 3)
+            f += f_additional
 
     # print("f: " + str(f))
 
@@ -82,20 +92,56 @@ def bin_to_double(number, rounding = "none"):
 
 
 if __name__ == "__main__":
-
+    # matches answers-4.txt (not normalized, starting with -4)
     number_raw = "0100000001111110101110010000000000000000000000000000000000000000"
 
     # Part 1
-    print("%.5f" % bin_to_double(number_raw))
+    print("%.4f" % bin_to_double(number_raw))
 
     print("")
 
     # Part 2
-    print("%.3g" % bin_to_double(number_raw, rounding = "chopping"))
+    print("%.1f" % bin_to_double(number_raw, rounding = "chopping"))
 
     print("")
 
     # Part 3
-    print("%.3g" % bin_to_double(number_raw, rounding = "rounding"))
+    print("%.1f" % bin_to_double(number_raw, rounding = "rounding"))
+
+    print("")
+
+    # Part 4
+    exact = Fraction(bin_to_double(number_raw))
+    rounded = Fraction(bin_to_double(number_raw, rounding = "rounding"))
+    diff = exact - rounded
+    relative = abs(Fraction(diff, exact))
+
+    print(abs(float(exact-rounded)))
+
+    # print("%.31f" % (abs(exact-rounded)/abs(exact)))
+    # print("%.31f" % (abs(1 - rounded / exact)))
+    # print("%.31f" % relative)
+    # print(relative)
+    print("0.0008900190718372536554354736173") # teacher's
+    # print("%.31f" % float(0.0008900190718372536554354736173)) # teacher's answer rounded to a float
+    # print("0.0008900190718372536554354736172917991099809281627463445645263827...") # wolfram
+
+
+    print("")
+    # Part 5
+    # do the stuff
+    print("21")
+
+    print("")
+
+    # Part 6a
+    print("17")
+
+    print("")
+
+    # Part 6b
+    print(approx("x**3+4*x**2-10", "3*x**2+8*x", -4, 0.0001))
+
+
 
 
