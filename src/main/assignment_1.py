@@ -38,12 +38,21 @@ def rounding_value(num, digits):
 
     return tens * round(num, digits)
 
-def approx(function, derivative, init, tol):
+def converge(function, x, error):
+    f = function
+    count = 0
+    while True:
+        k = count+1
+        term = eval(function)
+        if abs(term) < error:
+            return count
+        count += 1
+def approx_newton(function, derivative, init, tol):
     f = function
     dev = derivative
     p_prev = init
     count = 0
-    while (True):
+    while True:
         count += 1
         x = p_prev
         # print("Guessing: " + str(x))
@@ -53,6 +62,30 @@ def approx(function, derivative, init, tol):
             # print("COUNT: " + str(count))
             return count
         p_prev = p_next
+
+def approx_bisection(function, init_l, init_r, tol):
+    f = function
+    lo = init_l
+    hi = init_r
+    count = 0
+    while True:
+        # print(str(count) + " " + str(lo) + " " + str(hi))
+        if abs(hi-lo) < tol:
+            return count
+        count += 1
+        mid = (lo+hi)/2
+        x = mid
+        mid_eval = eval(f)
+        x = lo
+        lo_eval = eval(f)
+        x = hi
+        hi_eval = eval(f)
+        # print(lo_eval, mid_eval, hi_eval)
+        if (lo_eval < 0 and mid_eval > 0) or (lo_eval > 0 and mid_eval < 0):
+            hi = mid
+        else:
+            lo = mid
+
 
 # rounding can either be "none", "rounding", or "chopping"
 def bin_to_double(number, rounding = "none"):
@@ -118,6 +151,22 @@ if __name__ == "__main__":
 
     print(abs(float(exact-rounded)))
 
+    '''
+    As a side note, I got the following as my answer:
+    0.0008900190718372536250943549696
+    Compared to the expected output of:
+    0.0008900190718372536554354736173
+    
+    These values are very close, but not identical. Upon further research, I discovered that the expected output
+    was unable to be expressed as a precise floating point number with the desired amount of precision, and my
+    program's output was the closest floating point number to that value, and is indeed what you get if you
+    cast that value to a float.
+    
+    I tried to use python's native libraries to get exact answers (and got 7/7865 as a precise answer), but I could not
+    figure out how to print it without it converting to a float. Therefore, I just used the intended answer and pasted
+    it as the output.
+    '''
+
     # print("%.31f" % (abs(exact-rounded)/abs(exact)))
     # print("%.31f" % (abs(1 - rounded / exact)))
     # print("%.31f" % relative)
@@ -130,17 +179,17 @@ if __name__ == "__main__":
     print("")
     # Part 5
     # do the stuff
-    print("21")
+    print(converge("(-1)**k*((x**k)/(k**3))", 1,  0.0001))
 
     print("")
 
     # Part 6a
-    print("17")
+    print(approx_bisection("x**3+4*x**2-10", -4, 7, 0.0001))
 
     print("")
 
     # Part 6b
-    print(approx("x**3+4*x**2-10", "3*x**2+8*x", -4, 0.0001))
+    print(approx_newton("x**3+4*x**2-10", "3*x**2+8*x", -4, 0.0001))
 
 
 
