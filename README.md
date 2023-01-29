@@ -13,6 +13,7 @@ This should automatically run the program.
 ## On Question 4's floating point precision
 When programming the solution for question 4, I got the following as my answer for the relative error:
 0.0008900190718372536250943549696
+
 Compared to the expected output of:
 0.0008900190718372536554354736173
 
