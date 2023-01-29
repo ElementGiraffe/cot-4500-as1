@@ -191,6 +191,8 @@ if __name__ == "__main__":
     # Part 6b
     print(approx_newton("x**3+4*x**2-10", "3*x**2+8*x", -4, 0.0001))
 
+    print("")
+
 
 
 
